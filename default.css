@@ -1,0 +1,16 @@
+body {
+    background-color: #334;
+    color: #eee;
+    text-align: center;
+    padding-top: 2%;
+}
+
+img,
+svg {
+    height: 3em;
+}
+
+.invert {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+}
