@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Main script that manages the templates for other scripts
 // @author       LittleEndu
 // @grant        GM_xmlhttpRequest
