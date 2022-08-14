@@ -16,7 +16,7 @@ window.addEventListener('load', () => {
     if (params.template) {
         console.log('loading template', params.template);
         let templates = []
-        initTemplatesFromJsonUrl(templates, params.template, document.body, document.querySelectorAll('canvas')[0].parentNode)
+        initTemplatesFromJsonUrl(templates, params.template, document.body, document.querySelector('canvas').parentNode)
         setInterval(() => {
             for (let template of templates) {
                 template.update();
