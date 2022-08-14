@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         place2022 Templating script
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.0.2
 // @description  try to take over the canvas! Original version by oralekin, LittleEndu, ekgame, Wieku, DeadRote, exdeejay (xDJ_), 101arrowz
 // @author       LittleEndu
 // @match        https://hot-potato.reddit.com/embed*
@@ -21,7 +21,9 @@ if (window.top !== window.self) {
             gotUrlParams = true;
             const params = ev.data.urlParams;
             if (params.template) {
+                // noinspection CssInvalidHtmlTagReference
                 const camera = document.querySelector("mona-lisa-embed").shadowRoot.querySelector("mona-lisa-camera");
+                // noinspection CssInvalidHtmlTagReference
                 const canvas = camera.querySelector("mona-lisa-canvas");
                 const templateMountPoint = canvas.shadowRoot.querySelector('.container')
                 console.log(templateMountPoint)
