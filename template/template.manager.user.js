@@ -141,7 +141,9 @@ class Template {
             ditheredContext.putImageData(ditheredData, 0, 0)
             this.templateElement.src = ditheredCanvas.toDataURL()
 
-            console.log(`updated ${this.source} to frame ${currentFrame}/${this.frameCount}`)
+            if (this.frameRate > 30) {
+                console.log(`updated ${this.source} to frame ${currentFrame}/${this.frameCount}`)
+            }
         }
     }
 }
