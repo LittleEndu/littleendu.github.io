@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  Main script that manages the templates for other scripts
 // @author       LittleEndu
 // @grant        none
@@ -18,9 +18,9 @@ class Template {
         this.priority = priority;
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
-        this.frameCount = frameCount;
-        this.frameRate = frameRate;
-        this.startTime = startTime;
+        this.frameCount = frameCount || 1;
+        this.frameRate = frameRate || 1;
+        this.startTime = startTime || 0;
         this.lastFrame = -1;
 
         // create element to hold the image
