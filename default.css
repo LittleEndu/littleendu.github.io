@@ -1,0 +1,15 @@
+body {
+    background-color: #334;
+    color: #eee;
+    text-align: center;
+    padding-top: 2%;
+}
+
+a,
+a:visited {
+    color: #eee;
+}
+
+.spaced {
+    line-height: 1.3em;
+}
