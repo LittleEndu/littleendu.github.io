@@ -161,7 +161,7 @@ async function initTemplatesFromJsonUrl(url, loaderMountPoint, templateMountPoin
     let response = await fetch(_url);
     let json = await response.json();
     // load our templates
-    for (let template of json.templates) {
+    for (let template of json.templates || []) {
         let t = new Template(
             template.url,
             priority++,
@@ -176,7 +176,7 @@ async function initTemplatesFromJsonUrl(url, loaderMountPoint, templateMountPoin
         rv.push(t);
     }
     // load templates from other json files
-    for (let child of json.children) {
+    for (let child of json.children || []) {
         rv = rv.concat(await initTemplatesFromJsonUrl(child.url, loaderMountPoint, templateMountPoint, priority, depth + 1));
     }
     return rv;
