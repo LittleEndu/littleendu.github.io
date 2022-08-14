@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         place2022 Templating script
 // @namespace    http://tampermonkey.net/
-// @version      0.8
+// @version      1.0
 // @description  try to take over the canvas! Original version by oralekin, LittleEndu, ekgame, Wieku, DeadRote, exdeejay (xDJ_), 101arrowz
 // @author       LittleEndu
 // @match        https://hot-potato.reddit.com/embed*
@@ -15,7 +15,6 @@ if (window.top !== window.self) {
     // inside the hot-potato iframe
     let gotUrlParams = false;
     window.addEventListener('message', ev => {
-        console.log('got message from top window', ev.data);
         if (gotUrlParams) return;
         if (ev.data.type === 'loadTemplates') {
             console.log(`loading templates, gotUrlParams=${gotUrlParams}`);
@@ -39,7 +38,6 @@ if (window.top !== window.self) {
     })
     window.addEventListener('load', () => {
         // ask the top window for url params
-        console.log('sending message to top window');
         window.top.postMessage({type: 'loadTemplates'}, '*');
     })
 } else {
@@ -54,13 +52,11 @@ if (window.top !== window.self) {
         }
     }
     window.addEventListener('message', ev => {
-        console.log('got message from iframe', ev.data);
         if (ev.data.type === 'loadTemplates') {
             sendParams()
         }
     })
     window.addEventListener('load', () => {
-        console.log('sending message to iframes');
         sendParams()
     })
 }
