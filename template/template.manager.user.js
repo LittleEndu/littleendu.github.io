@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      1.0
 // @description  Main script that manages the templates for other scripts
 // @author       LittleEndu
 // @grant        GM_xmlhttpRequest
@@ -147,7 +147,6 @@ class Template {
 }
 
 function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMountPoint, priority = 0, depth = 0, alreadyLoaded = []) {
-
     if (depth > 10) {
         return
     }

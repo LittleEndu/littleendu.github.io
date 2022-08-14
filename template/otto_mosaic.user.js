@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Templating script for the mosaic site by Ottomated
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      1.0.1
 // @description  try to take over the canvas!
 // @author       LittleEndu
 // @match        https://mosaic.ludwig.gg/*
 // @require      https://littleendu.github.io/template/template.manager.user.js
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 window.addEventListener('load', () => {
