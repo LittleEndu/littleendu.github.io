@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.2.1
 // @description  Main script that manages the templates for other scripts
 // @author       LittleEndu
 // @grant        none
@@ -29,6 +29,42 @@ class Template {
             this.frameWidth = this.frameWidth || this.imageLoader.naturalWidth;
             this.frameHeight = this.frameHeight || this.imageLoader.naturalHeight;
             this.atlasSize = Math.round(this.imageLoader.naturalWidth / this.frameWidth);
+
+            // create element to hold the template
+            this.templateElement = document.createElement('img');
+            this.templateElement.style = `
+                position: absolute;
+                top: ${y}px;
+                left: ${x}px;
+                width: ${this.frameWidth}px;
+                height: ${this.frameHeight}px;
+                pointer-events: none;
+                image-rendering: pixelated;
+            `;
+            this.templateElement.priority = priority;
+            // mount template element to the template mount point according to the priority
+            // get all template elements and sort them by priority
+            let templateElements = templateMountPoint.children;
+            let templateElementsArray = Array.from(templateElements);
+            // remove from array any element where priority is undefined
+            templateElementsArray = templateElementsArray.filter(element => element.priority !== undefined);
+            // if there are no elements with priority, just append the template element to the template mount point
+            if (templateElementsArray.length === 0) {
+                templateMountPoint.appendChild(this.templateElement);
+            } else {
+                // add the new template element to the array
+                templateElementsArray.push(this.templateElement);
+                // sort the array by priority
+                templateElementsArray.sort((a, b) => b.priority - a.priority);
+                // find the index of the new template element in the sorted array
+                let index = templateElementsArray.findIndex(element => element === this.templateElement);
+                // insert the new template element at the index
+                if (index === templateElementsArray.length - 1) {
+                    templateMountPoint.appendChild(this.templateElement);
+                } else {
+                    templateMountPoint.insertBefore(this.templateElement, templateElementsArray[index + 1]);
+                }
+            }
         }
         this.imageLoader.style = `
             position: absolute; 
@@ -42,42 +78,6 @@ class Template {
         this.imageLoader.crossOrigin = 'Anonymous';
         this.imageLoader.src = source;
         loaderMountPoint.appendChild(this.imageLoader) // firefox would otherwise not load the image
-
-        // create element to hold the template
-        this.templateElement = document.createElement('img');
-        this.templateElement.style = `
-            position: absolute;
-            top: ${y}px;
-            left: ${x}px;
-            width: ${frameWidth}px;
-            height: ${frameHeight}px;
-            pointer-events: none;
-            image-rendering: pixelated;
-        `;
-        this.templateElement.priority = priority;
-        // mount template element to the template mount point according to the priority
-        // get all template elements and sort them by priority
-        let templateElements = templateMountPoint.children;
-        let templateElementsArray = Array.from(templateElements);
-        // remove from array any element where priority is undefined
-        templateElementsArray = templateElementsArray.filter(element => element.priority !== undefined);
-        // if there are no elements with priority, just append the template element to the template mount point
-        if (templateElementsArray.length === 0) {
-            templateMountPoint.appendChild(this.templateElement);
-        } else {
-            // add the new template element to the array
-            templateElementsArray.push(this.templateElement);
-            // sort the array by priority
-            templateElementsArray.sort((a, b) => b.priority - a.priority);
-            // find the index of the new template element in the sorted array
-            let index = templateElementsArray.findIndex(element => element === this.templateElement);
-            // insert the new template element at the index
-            if (index === templateElementsArray.length - 1) {
-                templateMountPoint.appendChild(this.templateElement);
-            } else {
-                templateMountPoint.insertBefore(this.templateElement, templateElementsArray[index + 1]);
-            }
-        }
     }
 
     update() {
