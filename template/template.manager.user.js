@@ -4,7 +4,7 @@
 // @version      0.2.1
 // @description  Main script that manages the templates for other scripts
 // @author       LittleEndu
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 function currentTime() {
@@ -146,38 +146,43 @@ class Template {
     }
 }
 
-async function initTemplatesFromJsonUrl(url, loaderMountPoint, templateMountPoint, priority = 0, depth = 0, alreadyLoaded = []) {
-    let rv = [];
+function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMountPoint, priority = 0, depth = 0, alreadyLoaded = []) {
+
     if (depth > 10) {
-        return rv
+        return
     }
     let _url = new URL(url);
     if (alreadyLoaded.includes(`${_url.origin}${_url.pathname}`)) {
-        return rv
+        return
     }
     alreadyLoaded.push(`${_url.origin}${_url.pathname}`)
     // do some cache busting
     _url.searchParams.append((Math.random() + 1).toString(36).substring(7), Date.now().toString(36));
-    let response = await fetch(_url);
-    let json = await response.json();
-    // load our templates
-    for (let template of json.templates || []) {
-        let t = new Template(
-            template.url,
-            priority++,
-            loaderMountPoint,
-            templateMountPoint,
-            template.x, template.y,
-            template.frameWidth, template.frameHeight,
-            template.frameCount,
-            template.frameRate,
-            template.startTime
-        );
-        rv.push(t);
-    }
-    // load templates from other json files
-    for (let child of json.children || []) {
-        rv = rv.concat(await initTemplatesFromJsonUrl(child.url, loaderMountPoint, templateMountPoint, priority, depth + 1));
-    }
-    return rv;
+    // must use GM_xmlhttpRequest to bypass CORS
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: _url.href,
+        onload: function (response) {
+            let json = JSON.parse(response.responseText);
+            // load our templates
+            for (let template of json.templates || []) {
+                let t = new Template(
+                    template.url,
+                    priority++,
+                    loaderMountPoint,
+                    templateMountPoint,
+                    template.x, template.y,
+                    template.frameWidth, template.frameHeight,
+                    template.frameCount,
+                    template.frameRate,
+                    template.startTime
+                );
+                templates.push(t);
+            }
+            // load templates from other json files
+            for (let child of json.children || []) {
+                initTemplatesFromJsonUrl(templates, child.url, loaderMountPoint, templateMountPoint, priority, depth + 1);
+            }
+        }
+    })
 }

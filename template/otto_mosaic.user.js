@@ -15,12 +15,12 @@ window.addEventListener('load', () => {
     const params = Object.fromEntries(urlSearchParams.entries());
     if (params.template) {
         console.log('loading template', params.template);
-        initTemplatesFromJsonUrl(params.template, document.body, document.querySelectorAll('canvas')[0].parentNode).then((templates) => {
-            setInterval(() => {
-                for (let template of templates) {
-                    template.update();
-                }
-            }, 500);
-        }).catch(console.error);
+        let templates = []
+        initTemplatesFromJsonUrl(templates, params.template, document.body, document.querySelectorAll('canvas')[0].parentNode)
+        setInterval(() => {
+            for (let template of templates) {
+                template.update();
+            }
+        }, 500);
     }
 })
