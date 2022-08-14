@@ -147,7 +147,7 @@ class Template {
 }
 
 function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMountPoint, priority = 0, depth = 0, alreadyLoaded = []) {
-    if (depth > 10) {
+    if (depth > 10 || templates.length > 100) {
         return
     }
     let _url = new URL(url);
