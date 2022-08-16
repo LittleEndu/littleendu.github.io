@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         Templating script for the mosaic site by Ottomated
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.3
+// @updateURL    https://littleendu.github.io/template/otto_mosaic.user.js
 // @description  try to take over the canvas!
 // @author       LittleEndu
 // @match        https://mosaic.ludwig.gg/*

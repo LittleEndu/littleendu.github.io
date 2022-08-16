@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         place2022 Templating script
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.3
+// @updateURL    https://littleendu.github.io/template/place2022.user.js
 // @description  try to take over the canvas! Original version by oralekin, LittleEndu, ekgame, Wieku, DeadRote, exdeejay (xDJ_), 101arrowz
 // @author       LittleEndu
 // @match        https://hot-potato.reddit.com/embed*
 // @match        https://new.reddit.com/r/place*
-// @match        https://reddit.com/r/place*
 // @require      https://littleendu.github.io/template/template.manager.user.js
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
