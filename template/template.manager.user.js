@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.2.1
 // @description  Main script that manages the templates for other scripts
 // @author       LittleEndu
 // @grant        GM_xmlhttpRequest
@@ -166,7 +166,7 @@ function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMoun
 
     // EXTREMELY SILLY IMPLEMENTATION OF BREATH FIRST SEARCH
     // this works because xmlHttpRequest happens in parallel (template adding is triggered in onload)
-    sleep(20 * depth).then(() => {
+    sleep(200 * depth).then(() => {
         // must use GM_xmlhttpRequest to bypass CORS
         GM_xmlhttpRequest({
             method: 'GET',
