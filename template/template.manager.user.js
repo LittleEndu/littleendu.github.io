@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Main script that manages the templates for other scripts
 // @author       LittleEndu
 // @grant        GM_xmlhttpRequest
@@ -9,6 +9,10 @@
 
 function currentTime() {
     return Date.now() / 1000;
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 class Template {
@@ -159,31 +163,36 @@ function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMoun
     alreadyLoaded.push(`${_url.origin}${_url.pathname}`)
     // do some cache busting
     _url.searchParams.append((Math.random() + 1).toString(36).substring(7), Date.now().toString(36));
-    // must use GM_xmlhttpRequest to bypass CORS
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: _url.href,
-        onload: function (response) {
-            let json = JSON.parse(response.responseText);
-            // load our templates
-            for (let template of json.templates || []) {
-                let t = new Template(
-                    template.url,
-                    priority++,
-                    loaderMountPoint,
-                    templateMountPoint,
-                    template.x, template.y,
-                    template.frameWidth, template.frameHeight,
-                    template.frameCount,
-                    template.frameRate,
-                    template.startTime
-                );
-                templates.push(t);
+
+    // EXTREMELY SILLY IMPLEMENTATION OF BREATH FIRST SEARCH
+    // this works because xmlHttpRequest happens in parallel (template adding is triggered in onload)
+    sleep(20 * depth).then(() => {
+        // must use GM_xmlhttpRequest to bypass CORS
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: _url.href,
+            onload: function (response) {
+                let json = JSON.parse(response.responseText);
+                // load our templates
+                for (let template of json.templates || []) {
+                    let t = new Template(
+                        template.url,
+                        priority++,
+                        loaderMountPoint,
+                        templateMountPoint,
+                        template.x, template.y,
+                        template.frameWidth, template.frameHeight,
+                        template.frameCount,
+                        template.frameRate,
+                        template.startTime
+                    );
+                    templates.push(t);
+                }
+                // load templates from other json files
+                for (let child of json.children || []) {
+                    initTemplatesFromJsonUrl(templates, child.url, loaderMountPoint, templateMountPoint, priority, depth + 1);
+                }
             }
-            // load templates from other json files
-            for (let child of json.children || []) {
-                initTemplatesFromJsonUrl(templates, child.url, loaderMountPoint, templateMountPoint, priority, depth + 1);
-            }
-        }
+        })
     })
 }
