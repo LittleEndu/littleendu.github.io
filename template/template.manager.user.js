@@ -2,6 +2,8 @@
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
 // @version      1.2.1
+// @updateUrl    https://littleendu.github.io/template/template.manager.user.js
+// @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
 // @author       LittleEndu
 // @grant        GM_xmlhttpRequest

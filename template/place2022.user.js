@@ -3,6 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0.4
 // @updateURL    https://littleendu.github.io/template/place2022.user.js
+// @downloadURL  https://littleendu.github.io/template/place2022.user.js
 // @description  try to take over the canvas! Original version by oralekin, LittleEndu, ekgame, Wieku, DeadRote, exdeejay (xDJ_), 101arrowz
 // @author       LittleEndu
 // @match        https://hot-potato.reddit.com/embed*
@@ -11,54 +12,54 @@
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
-if (window.top !== window.self) {
-    // inside the hot-potato iframe
-    let gotUrlParams = false;
-    window.addEventListener('message', ev => {
-        if (gotUrlParams) return;
-        if (ev.data.type === 'loadTemplates') {
-            console.log(`loading templates, gotUrlParams=${gotUrlParams}`);
-            gotUrlParams = true;
-            const params = ev.data.urlParams;
-            if (params.template) {
-                // noinspection CssInvalidHtmlTagReference
-                const camera = document.querySelector("mona-lisa-embed").shadowRoot.querySelector("mona-lisa-camera");
-                // noinspection CssInvalidHtmlTagReference
-                const canvas = camera.querySelector("mona-lisa-canvas");
-                const templateMountPoint = canvas.shadowRoot.querySelector('.container')
-                console.log(templateMountPoint)
+window.addEventListener('load', () => {
+    if (window.top !== window.self) {
+        // inside the hot-potato iframe
+        let gotUrlParams = false;
+        window.addEventListener('message', ev => {
+            if (gotUrlParams) return;
+            if (ev.data.type === 'loadTemplates') {
+                console.log(gotUrlParams ? 'templates should already be loaded' : 'loading templates');
+                gotUrlParams = true;
+                const params = ev.data.urlParams;
+                if (params.template) {
+                    // noinspection CssInvalidHtmlTagReference
+                    const camera = document.querySelector("mona-lisa-embed").shadowRoot.querySelector("mona-lisa-camera");
+                    // noinspection CssInvalidHtmlTagReference
+                    const canvas = camera.querySelector("mona-lisa-canvas");
+                    const templateMountPoint = canvas.shadowRoot.querySelector('.container')
+                    console.log(templateMountPoint)
 
-                let templates = []
-                initTemplatesFromJsonUrl(templates, params.template, document.body, templateMountPoint)
-                setInterval(() => {
-                    for (let template of templates) {
-                        template.update();
-                    }
-                }, 500);
+                    let templates = []
+                    initTemplatesFromJsonUrl(templates, params.template, document.body, templateMountPoint)
+                    setInterval(() => {
+                        for (let template of templates) {
+                            template.update();
+                        }
+                    }, 500);
+                }
             }
-        }
-    })
-    window.addEventListener('load', () => {
+        })
+
         // ask the top window for url params
         window.top.postMessage({type: 'loadTemplates'}, '*');
-    })
-} else {
-    // inside the r/place subreddit
-    const sendParams = () => {
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        const params = Object.fromEntries(urlSearchParams.entries());
-        for (let iframe of document.querySelectorAll('iframe')) {
-            if (iframe.src.includes('hot-potato.reddit.com/embed')) {
-                iframe.contentWindow.postMessage({type: 'loadTemplates', urlParams: params}, '*');
+    } else {
+        // inside the r/place subreddit
+        const sendParams = () => {
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+            for (let iframe of document.querySelectorAll('iframe')) {
+                if (iframe.src.includes('hot-potato.reddit.com/embed')) {
+                    iframe.contentWindow.postMessage({type: 'loadTemplates', urlParams: params}, '*');
+                }
             }
         }
-    }
-    window.addEventListener('message', ev => {
-        if (ev.data.type === 'loadTemplates') {
-            sendParams()
-        }
-    })
-    window.addEventListener('load', () => {
+        window.addEventListener('message', ev => {
+            if (ev.data.type === 'loadTemplates') {
+                sendParams()
+            }
+        })
+
         sendParams()
-    })
-}
+    }
+})

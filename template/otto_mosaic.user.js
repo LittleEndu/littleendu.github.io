@@ -3,6 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0.4
 // @updateURL    https://littleendu.github.io/template/otto_mosaic.user.js
+// @downloadURL  https://littleendu.github.io/template/otto_mosaic.user.js
 // @description  try to take over the canvas!
 // @author       LittleEndu
 // @match        https://mosaic.ludwig.gg/*
