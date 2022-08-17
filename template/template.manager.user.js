@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.3.1
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -31,6 +31,7 @@ class Template {
         this.startTime = startTime || 0;
         this.lastFrame = -1;
         this.everyNth = everyNth || 1;
+        this.randomness = Math.floor(Math.random() * this.everyNth);
 
         // create element to hold the image
         this.imageLoader = document.createElement('img');
@@ -131,10 +132,9 @@ class Template {
             // dither the image in scaledCanvas
             let data = scaledContext.getImageData(0, 0, this.frameWidth, this.frameHeight)
             let ditheredData = new ImageData(this.frameWidth * 3, this.frameHeight * 3)
-            let randomness = Math.floor(Math.random() * this.everyNth);
             for (let y = 0; y < this.frameHeight; y++) {
                 for (let x = 0; x < this.frameWidth; x++) {
-                    if ((x + y * 2 + randomness) % this.everyNth !== 0) {
+                    if ((x + y * 2 + this.randomness) % this.everyNth !== 0) {
                         continue
                     }
                     let index = (y * this.frameWidth + x) * 4
