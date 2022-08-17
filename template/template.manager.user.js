@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.2.1
+// @version      1.3
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -18,7 +18,9 @@ function sleep(ms) {
 }
 
 class Template {
-    constructor(source, priority, loaderMountPoint, templateMountPoint, x, y, frameWidth, frameHeight, frameCount = null, frameRate = null, startTime = null) {
+    constructor(source, priority, loaderMountPoint, templateMountPoint,
+                x, y, frameWidth, frameHeight,
+                frameCount = null, frameRate = null, startTime = null, everyNth = 1) {
         // save params
         this.source = source;
         this.priority = priority;
@@ -28,6 +30,7 @@ class Template {
         this.frameRate = frameRate || 1;
         this.startTime = startTime || 0;
         this.lastFrame = -1;
+        this.everyNth = everyNth || 1;
 
         // create element to hold the image
         this.imageLoader = document.createElement('img');
@@ -128,8 +131,12 @@ class Template {
             // dither the image in scaledCanvas
             let data = scaledContext.getImageData(0, 0, this.frameWidth, this.frameHeight)
             let ditheredData = new ImageData(this.frameWidth * 3, this.frameHeight * 3)
+            let randomness = Math.floor(Math.random() * this.everyNth);
             for (let y = 0; y < this.frameHeight; y++) {
                 for (let x = 0; x < this.frameWidth; x++) {
+                    if ((x + y * 2 + randomness) % this.everyNth !== 0) {
+                        continue
+                    }
                     let index = (y * this.frameWidth + x) * 4
                     let middlePixelIndex = ((y * 3 + 1) * ditheredData.width + x * 3 + 1) * 4;
                     ditheredData.data[middlePixelIndex] = data.data[index];
@@ -154,7 +161,8 @@ class Template {
     }
 }
 
-function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMountPoint, priority = 0, depth = 0, alreadyLoaded = []) {
+function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMountPoint,
+                                  priority = 0, depth = 0, alreadyLoaded = []) {
     if (depth > 10 || templates.length > 100) {
         return
     }
@@ -186,7 +194,8 @@ function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMoun
                         template.frameWidth, template.frameHeight,
                         template.frameCount,
                         template.frameRate,
-                        template.startTime
+                        template.startTime,
+                        template.everyNth
                     );
                     templates.push(t);
                 }
