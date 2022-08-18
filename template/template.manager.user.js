@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.4.1
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -18,6 +18,7 @@ function sleep(ms) {
 }
 
 const SECONDS_SPENT_BLINKING = 5;
+const AMOUNT_OF_BLINKING = 15;
 
 class Template {
     constructor(source, priority, loaderMountPoint, templateMountPoint,
@@ -114,10 +115,10 @@ class Template {
         if (this.frameRate >= 30 && !this.blinkingInterval && blinkingFrame !== currentFrame) {
             this.startBlinking()
         }
+
         if (currentFrame !== this.lastFrame || this.isCurrentlyNth !== this.shouldNth) {
             this.isCurrentlyNth = this.shouldNth
             this.lastFrame = currentFrame;
-            this.stopBlinking()
             let scaledCanvas = document.createElement('canvas');
             scaledCanvas.width = this.frameWidth;
             scaledCanvas.height = this.frameHeight;
@@ -172,7 +173,15 @@ class Template {
             let ditheredContext = ditheredCanvas.getContext('2d')
             ditheredContext.putImageData(ditheredData, 0, 0)
             this.templateElement.src = ditheredCanvas.toDataURL()
-            this.templateElement.style.opacity = '1'
+            // reset blinking here
+            if (this.blinkingInterval){
+                clearInterval(this.blinkingInterval)
+                this.blinkingInterval = null
+            }
+            this.templateElement.style.opacity = Number.MIN_VALUE.toString()
+            setTimeout(() => {
+                this.templateElement.style.opacity = '1'
+            }, SECONDS_SPENT_BLINKING / AMOUNT_OF_BLINKING * 1000)
 
             if (this.frameRate > 30) {
                 console.log(`updated ${this.source} to frame ${currentFrame}/${this.frameCount}`)
@@ -181,18 +190,14 @@ class Template {
     }
 
     startBlinking() {
-        this.stopBlinking()
+        if (this.blinkingInterval){
+            clearInterval(this.blinkingInterval)
+            this.templateElement.style.opacity = '1'
+        }
         this.blinkingInterval = setInterval(() => {
             let currentOpacity = this.templateElement.style.opacity
             this.templateElement.style.opacity = Number.parseFloat(currentOpacity) !== 1 ? '1' : Number.MIN_VALUE.toString()
-        }, SECONDS_SPENT_BLINKING / 16 * 1000 + 1)
-    }
-
-    stopBlinking() {
-        if (this.blinkingInterval) {
-            clearInterval(this.blinkingInterval)
-        }
-        this.blinkingInterval = null
+        }, SECONDS_SPENT_BLINKING / AMOUNT_OF_BLINKING * 1000)
     }
 }
 
