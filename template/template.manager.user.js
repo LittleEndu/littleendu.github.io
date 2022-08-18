@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.3.1
+// @version      1.4
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -9,7 +9,7 @@
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
-function currentTime() {
+function currentSeconds() {
     return Date.now() / 1000;
 }
 
@@ -17,10 +17,12 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const SECONDS_SPENT_BLINKING = 5;
+
 class Template {
     constructor(source, priority, loaderMountPoint, templateMountPoint,
                 x, y, frameWidth, frameHeight,
-                frameCount = null, frameRate = null, startTime = null, everyNth = 1) {
+                frameCount = null, frameRate = null, startTime = null) {
         // save params
         this.source = source;
         this.priority = priority;
@@ -30,8 +32,12 @@ class Template {
         this.frameRate = frameRate || 1;
         this.startTime = startTime || 0;
         this.lastFrame = -1;
-        this.everyNth = everyNth || 1;
-        this.randomness = Math.floor(Math.random() * this.everyNth);
+        this.randomness = Math.floor(Math.random() * 4);
+        this.blinkingInterval = null;
+        this.isCurrentlyNth = true;
+        this.shouldNth = false;
+        this.secondsSpentNthd = (frameRate - SECONDS_SPENT_BLINKING) / 2
+        this.forceNth = false;
 
         // create element to hold the image
         this.imageLoader = document.createElement('img');
@@ -95,10 +101,23 @@ class Template {
             return;
         }
 
-        let currentFrameIndex = Math.floor((currentTime() - this.startTime) / this.frameRate);
+        let currentFrameIndex = Math.floor((currentSeconds() - this.startTime) / this.frameRate);
         let currentFrame = (currentFrameIndex % this.frameCount + this.frameCount) % this.frameCount;
-        if (currentFrame !== this.lastFrame) {
+
+        let blinkingFrameIndex = Math.floor((currentSeconds() + SECONDS_SPENT_BLINKING - this.startTime) / this.frameRate)
+        let blinkingFrame = (blinkingFrameIndex % this.frameCount + this.frameCount) % this.frameCount;
+
+        let nthFrameIndex = Math.floor((currentSeconds() + this.secondsSpentNthd + SECONDS_SPENT_BLINKING - this.startTime) / this.frameRate)
+        let nthFrame = (nthFrameIndex % this.frameCount + this.frameCount) % this.frameCount;
+        this.shouldNth = (this.frameRate >= 30 ? currentFrame === nthFrame : false) || this.forceNth;
+
+        if (this.frameRate >= 30 && !this.blinkingInterval && blinkingFrame !== currentFrame) {
+            this.startBlinking()
+        }
+        if (currentFrame !== this.lastFrame || this.isCurrentlyNth !== this.shouldNth) {
+            this.isCurrentlyNth = this.shouldNth
             this.lastFrame = currentFrame;
+            this.stopBlinking()
             let scaledCanvas = document.createElement('canvas');
             scaledCanvas.width = this.frameWidth;
             scaledCanvas.height = this.frameHeight;
@@ -134,7 +153,7 @@ class Template {
             let ditheredData = new ImageData(this.frameWidth * 3, this.frameHeight * 3)
             for (let y = 0; y < this.frameHeight; y++) {
                 for (let x = 0; x < this.frameWidth; x++) {
-                    if ((x + y * 2 + this.randomness) % this.everyNth !== 0) {
+                    if (this.shouldNth && (x + y * 2 + this.randomness) % 4 !== 0) {
                         continue
                     }
                     let index = (y * this.frameWidth + x) * 4
@@ -153,11 +172,27 @@ class Template {
             let ditheredContext = ditheredCanvas.getContext('2d')
             ditheredContext.putImageData(ditheredData, 0, 0)
             this.templateElement.src = ditheredCanvas.toDataURL()
+            this.templateElement.style.opacity = '1'
 
             if (this.frameRate > 30) {
                 console.log(`updated ${this.source} to frame ${currentFrame}/${this.frameCount}`)
             }
         }
+    }
+
+    startBlinking() {
+        this.stopBlinking()
+        this.blinkingInterval = setInterval(() => {
+            let currentOpacity = this.templateElement.style.opacity
+            this.templateElement.style.opacity = Number.parseFloat(currentOpacity) !== 1 ? '1' : Number.MIN_VALUE.toString()
+        }, SECONDS_SPENT_BLINKING / 16 * 1000 + 1)
+    }
+
+    stopBlinking() {
+        if (this.blinkingInterval) {
+            clearInterval(this.blinkingInterval)
+        }
+        this.blinkingInterval = null
     }
 }
 
@@ -194,8 +229,7 @@ function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMoun
                         template.frameWidth, template.frameHeight,
                         template.frameCount,
                         template.frameRate,
-                        template.startTime,
-                        template.everyNth
+                        template.startTime
                     );
                     templates.push(t);
                 }
