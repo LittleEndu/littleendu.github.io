@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         place2022 Templating script
 // @namespace    http://tampermonkey.net/
-// @version      1.0.5
+// @version      1.0.6
 // @updateURL    https://littleendu.github.io/template/place2022.user.js
 // @downloadURL  https://littleendu.github.io/template/place2022.user.js
 // @description  try to take over the canvas! Original version by oralekin, LittleEndu, ekgame, Wieku, DeadRote, exdeejay (xDJ_), 101arrowz

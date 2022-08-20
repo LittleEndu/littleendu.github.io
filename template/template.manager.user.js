@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.4.2
+// @version      1.5
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -173,7 +173,7 @@ class Template {
             this.templateElement.src = ditheredCanvas.toDataURL()
             // reset blinking here
             if (this.lastFrame !== currentFrame) {
-                if (this.blinkingInterval){
+                if (this.blinkingInterval) {
                     clearInterval(this.blinkingInterval)
                     this.blinkingInterval = null
                 }
@@ -192,7 +192,7 @@ class Template {
     }
 
     startBlinking() {
-        if (this.blinkingInterval){
+        if (this.blinkingInterval) {
             clearInterval(this.blinkingInterval)
             this.templateElement.style.opacity = '1'
         }
@@ -209,42 +209,42 @@ function initTemplatesFromJsonUrl(templates, url, loaderMountPoint, templateMoun
         return
     }
     let _url = new URL(url);
-    if (alreadyLoaded.includes(`${_url.origin}${_url.pathname}`)) {
+    let uniqueString = `${_url.origin}${_url.pathname}`
+    if (alreadyLoaded.includes(uniqueString)) {
         return
     }
-    alreadyLoaded.push(`${_url.origin}${_url.pathname}`)
+    alreadyLoaded.push(uniqueString)
+    console.log(`loading ${uniqueString}`)
     // do some cache busting
     _url.searchParams.append((Math.random() + 1).toString(36).substring(7), Date.now().toString(36));
 
-    // EXTREMELY SILLY IMPLEMENTATION OF BREATH FIRST SEARCH
+    // HACKY IMPLEMENTATION OF BREATH FIRST SEARCH
     // this works because xmlHttpRequest happens in parallel (template adding is triggered in onload)
-    sleep(200 * depth).then(() => {
-        // must use GM_xmlhttpRequest to bypass CORS
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: _url.href,
-            onload: function (response) {
-                let json = JSON.parse(response.responseText);
-                // load our templates
-                for (let template of json.templates || []) {
-                    let t = new Template(
-                        template.url,
-                        priority++,
-                        loaderMountPoint,
-                        templateMountPoint,
-                        template.x, template.y,
-                        template.frameWidth, template.frameHeight,
-                        template.frameCount,
-                        template.frameRate,
-                        template.startTime
-                    );
-                    templates.push(t);
-                }
-                // load templates from other json files
-                for (let child of json.children || []) {
-                    initTemplatesFromJsonUrl(templates, child.url, loaderMountPoint, templateMountPoint, priority, depth + 1);
-                }
+    // must use GM_xmlhttpRequest to bypass CORS
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: _url.href,
+        onload: function (response) {
+            let json = JSON.parse(response.responseText);
+            // load our templates
+            for (let template of json.templates || []) {
+                let t = new Template(
+                    template.url,
+                    priority++,
+                    loaderMountPoint,
+                    templateMountPoint,
+                    template.x, template.y,
+                    template.frameWidth, template.frameHeight,
+                    template.frameCount,
+                    template.frameRate,
+                    template.startTime
+                );
+                templates.push(t);
             }
-        })
+            // load templates from other json files
+            for (let child of json.children || []) {
+                initTemplatesFromJsonUrl(templates, child.url, loaderMountPoint, templateMountPoint, priority, depth + 1, alreadyLoaded);
+            }
+        }
     })
 }
