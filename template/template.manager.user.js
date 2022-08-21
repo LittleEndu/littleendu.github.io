@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.5
+// @version      1.5.1
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -11,10 +11,6 @@
 
 function currentSeconds() {
     return Date.now() / 1000;
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const SECONDS_SPENT_BLINKING = 5;

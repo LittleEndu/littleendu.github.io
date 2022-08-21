@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         place2022 Templating script
 // @namespace    http://tampermonkey.net/
-// @version      1.0.6
+// @version      1.0.7
 // @updateURL    https://littleendu.github.io/template/place2022.user.js
 // @downloadURL  https://littleendu.github.io/template/place2022.user.js
 // @description  try to take over the canvas! Original version by oralekin, LittleEndu, ekgame, Wieku, DeadRote, exdeejay (xDJ_), 101arrowz
@@ -12,7 +12,10 @@
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
+console.log("place2022.user.js loaded")
+
 window.addEventListener('load', () => {
+    console.log("onload")
     if (window.top !== window.self) {
         let intervalId = null;
         // inside the hot-potato iframe
@@ -41,6 +44,15 @@ window.addEventListener('load', () => {
                             template.update();
                         }
                     }, 500);
+                    let forceNth = false
+                    window.addEventListener('keydown', ev => {
+                        if (ev.key === 't') {
+                            forceNth = !forceNth;
+                            for (let template of templates) {
+                                template.forceNth = forceNth
+                            }
+                        }
+                    })
                 }
             }
         })

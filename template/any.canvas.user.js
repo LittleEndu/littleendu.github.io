@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Templating script for any canvas
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.0.1
 // @updateURL    https://littleendu.github.io/template/any.canvas.user.js
 // @downloadURL  https://littleendu.github.io/template/any.canvas.user.js
 // @description  try to take over the canvas! but only if the site is using a 1:1 html canvas
@@ -74,7 +74,7 @@ const initializer = setInterval(() => {
         clearInterval(initializer);
         console.log("canvas and url params found");
         if (templateUrl) {
-            console.log('loading template', templateUrl);
+            console.log('loading template from url parameter', templateUrl);
             let templates = []
             initTemplatesFromJsonUrl(templates, templateUrl, document.body, canvas.parentNode)
             setInterval(() => {
@@ -83,6 +83,15 @@ const initializer = setInterval(() => {
                     template.templateElement.style.background = 'none'
                 }
             }, 500);
+            let forceNth = false;
+            window.addEventListener('keydown', ev => {
+                if (ev.key === 't') {
+                    forceNth = !forceNth;
+                    for (let template of templates) {
+                        template.forceNth = forceNth
+                    }
+                }
+            })
         }
     }
 }, 1000)
