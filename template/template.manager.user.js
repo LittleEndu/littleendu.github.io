@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.6
+// @version      1.7
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -168,7 +168,7 @@ class Template {
             ditheredContext.putImageData(ditheredData, 0, 0)
             this.templateElement.src = ditheredCanvas.toDataURL()
             // reset blinking here
-            if (this.lastFrame !== currentFrame) {
+            if (this.frameRate >= 30 && this.lastFrame !== currentFrame) {
                 if (this.blinkingInterval) {
                     clearInterval(this.blinkingInterval)
                     this.blinkingInterval = null
