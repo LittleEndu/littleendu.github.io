@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.5.1
+// @version      1.6
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -196,6 +196,13 @@ class Template {
             let currentOpacity = this.templateElement.style.opacity
             this.templateElement.style.opacity = Number.parseFloat(currentOpacity) !== 1 ? '1' : Number.MIN_VALUE.toString()
         }, SECONDS_SPENT_BLINKING / AMOUNT_OF_BLINKING * 1000)
+    }
+
+    destroy() {
+        this.templateElement.parentElement.removeChild(this.templateElement)
+        delete this.templateElement
+        this.imageLoader.parentElement.removeChild(this.imageLoader)
+        delete this.imageLoader
     }
 }
 

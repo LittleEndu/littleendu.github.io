@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         place2022 Templating script
 // @namespace    http://tampermonkey.net/
-// @version      1.0.7
+// @version      1.0.8
 // @updateURL    https://littleendu.github.io/template/place2022.user.js
 // @downloadURL  https://littleendu.github.io/template/place2022.user.js
 // @description  try to take over the canvas! Original version by oralekin, LittleEndu, ekgame, Wieku, DeadRote, exdeejay (xDJ_), 101arrowz
@@ -11,6 +11,7 @@
 // @require      https://littleendu.github.io/template/template.manager.user.js
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
+// noinspection CssInvalidHtmlTagReference,DuplicatedCode
 
 console.log("place2022.user.js loaded")
 
@@ -30,9 +31,7 @@ window.addEventListener('load', () => {
                 gotUrlParams = true;
                 const params = ev.data.urlParams;
                 if (params.template) {
-                    // noinspection CssInvalidHtmlTagReference
                     const camera = document.querySelector("mona-lisa-embed").shadowRoot.querySelector("mona-lisa-camera");
-                    // noinspection CssInvalidHtmlTagReference
                     const canvas = camera.querySelector("mona-lisa-canvas");
                     const templateMountPoint = canvas.shadowRoot.querySelector('.container')
                     console.log(templateMountPoint)
@@ -51,6 +50,15 @@ window.addEventListener('load', () => {
                             for (let template of templates) {
                                 template.forceNth = forceNth
                             }
+                        } else if (ev.key === 'r') {
+                            while (true) {
+                                let t = templates.shift()
+                                if (t === undefined) {
+                                    break
+                                }
+                                t.destroy()
+                            }
+                            initTemplatesFromJsonUrl(templates, params.template, document.body, templateMountPoint)
                         }
                     })
                 }
