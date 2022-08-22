@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.7
+// @version      1.7.1
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -15,6 +15,7 @@ function currentSeconds() {
 
 const SECONDS_SPENT_BLINKING = 5;
 const AMOUNT_OF_BLINKING = 15;
+const RANDOMNESS = Math.floor(Math.random() * 4);
 
 class Template {
     constructor(source, priority, loaderMountPoint, templateMountPoint,
@@ -29,7 +30,6 @@ class Template {
         this.frameRate = frameRate || 1;
         this.startTime = startTime || 0;
         this.lastFrame = -1;
-        this.randomness = Math.floor(Math.random() * 4);
         this.blinkingInterval = null;
         this.isCurrentlyNth = true;
         this.shouldNth = false;
@@ -148,7 +148,7 @@ class Template {
             let ditheredData = new ImageData(this.frameWidth * 3, this.frameHeight * 3)
             for (let y = 0; y < this.frameHeight; y++) {
                 for (let x = 0; x < this.frameWidth; x++) {
-                    if (this.shouldNth && (x + y * 2 + this.randomness) % 4 !== 0) {
+                    if (this.shouldNth && (x + y * 2 + RANDOMNESS) % 4 !== 0) {
                         continue
                     }
                     let index = (y * this.frameWidth + x) * 4
