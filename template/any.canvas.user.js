@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Templating script for any canvas
 // @namespace    http://tampermonkey.net/
-// @version      1.0.3
+// @version      1.1
 // @updateURL    https://littleendu.github.io/template/any.canvas.user.js
 // @downloadURL  https://littleendu.github.io/template/any.canvas.user.js
 // @description  try to take over the canvas! but only if the site is using a 1:1 html canvas
@@ -32,42 +32,45 @@ function findCanvas(element) {
     }
 }
 
-window.addEventListener('load', () => {
-    // try to find canvas regardless of whether the code is running in iframe or not
-    findCanvas(document.body);
 
-    if (window.top !== window.self) {
-        // iframe portion of the script
-        window.addEventListener('message', ev => {
-            if (ev.data.type === 'loadTemplates') {
-                console.log("got url params from window.top", ev.data.urlParams);
-                templateUrl = ev.data.urlParams.template;
-                urlParamsFound = true;
-            }
-        })
+// try to find canvas regardless of whether the code is running in iframe or not
+findCanvas(document.body);
 
-        window.top.postMessage({type: 'loadTemplates'}, '*');
-    } else {
-        // window.top portion of the script
-        const sendParams = () => {
-            const urlSearchParams = new URLSearchParams(window.location.search);
-            const params = Object.fromEntries(urlSearchParams.entries());
-            templateUrl = params.template;
+if (window.top !== window.self) {
+    // iframe portion of the script
+    window.addEventListener('message', ev => {
+        if (ev.data.type === 'loadTemplates') {
+            console.log("got url params from window.top", ev.data.urlParams);
+            templateUrl = ev.data.urlParams.template;
             urlParamsFound = true;
-            for (let iframe of document.querySelectorAll('iframe')) {
-                iframe.contentWindow.postMessage({type: 'loadTemplates', urlParams: params}, '*');
-            }
         }
+    })
 
-        window.addEventListener('message', ev => {
-            if (ev.data.type === 'loadTemplates') {
-                console.log("iframe requesting templates");
-                sendParams()
-            }
-        })
-        sendParams()
+    window.top.postMessage({type: 'loadTemplates'}, '*');
+} else {
+    // window.top portion of the script
+    const sendParams = () => {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        templateUrl = params.template;
+        urlParamsFound = true;
+        for (let iframe of document.querySelectorAll('iframe')) {
+            iframe.contentWindow.postMessage({type: 'loadTemplates', urlParams: params}, '*');
+        }
     }
-})
+
+    window.addEventListener('message', ev => {
+        if (ev.data.type === 'loadTemplates') {
+            console.log("iframe requesting templates");
+            sendParams()
+        }
+    })
+    window.addEventListener('load', () => {
+        sendParams()
+    })
+    sendParams()
+}
+
 
 const initializer = setInterval(() => {
     if (canvas && urlParamsFound) {
@@ -85,12 +88,12 @@ const initializer = setInterval(() => {
             }, 500);
             let forceNth = false;
             window.addEventListener('keydown', ev => {
-                if (ev.key === 'x') {
+                if (['KeyX', 'KeyE', 'KeyF'].includes(ev.code)) {
                     forceNth = !forceNth;
                     for (let template of templates) {
                         template.forceNth = forceNth
                     }
-                } else if (ev.key === 'r') {
+                } else if (ev.code === 'KeyR') {
                     while (true) {
                         let t = templates.shift()
                         if (t === undefined) {
