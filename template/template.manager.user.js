@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Template Manager
 // @namespace    http://tampermonkey.net/
-// @version      1.7.1
+// @version      1.7.2
 // @updateUrl    https://littleendu.github.io/template/template.manager.user.js
 // @downloadUrl  https://littleendu.github.io/template/template.manager.user.js
 // @description  Main script that manages the templates for other scripts
@@ -94,7 +94,12 @@ class Template {
     }
 
     update() {
-        if (this.imageLoader === undefined || !this.imageLoader.complete || this.imageLoader.naturalWidth === 0) {
+        if (
+            this.imageLoader === undefined
+            || !this.imageLoader.complete
+            || this.imageLoader.naturalWidth === 0
+            || this.templateElement === undefined
+        ) {
             return;
         }
 
