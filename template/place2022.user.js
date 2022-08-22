@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         place2022 Templating script
 // @namespace    http://tampermonkey.net/
-// @version      1.0.8
+// @version      1.0.9
 // @updateURL    https://littleendu.github.io/template/place2022.user.js
 // @downloadURL  https://littleendu.github.io/template/place2022.user.js
 // @description  try to take over the canvas! Original version by oralekin, LittleEndu, ekgame, Wieku, DeadRote, exdeejay (xDJ_), 101arrowz
@@ -45,7 +45,7 @@ window.addEventListener('load', () => {
                     }, 500);
                     let forceNth = false
                     window.addEventListener('keydown', ev => {
-                        if (ev.key === 't') {
+                        if (ev.key === 'x') {
                             forceNth = !forceNth;
                             for (let template of templates) {
                                 template.forceNth = forceNth
